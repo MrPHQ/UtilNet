@@ -86,7 +86,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\NetCmd.h" />
+    <ClInclude Include="inc\NetSelect.h" />
     <ClInclude Include="inc\UtilNet.h" />
+    <ClInclude Include="inc\UtilNetDef.h" />
     <ClInclude Include="internal.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -101,6 +103,7 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\NetCmd.cpp" />
+    <ClCompile Include="src\NetSelect.cpp" />
     <ClCompile Include="src\UtilNet.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

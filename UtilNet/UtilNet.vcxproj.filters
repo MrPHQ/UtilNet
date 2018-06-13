@@ -39,6 +39,12 @@
     <ClInclude Include="internal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="inc\UtilNetDef.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\NetSelect.h">
+      <Filter>inc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -51,6 +57,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\UtilNet.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NetSelect.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
