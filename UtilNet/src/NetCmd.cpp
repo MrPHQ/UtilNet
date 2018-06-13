@@ -4,11 +4,13 @@
 namespace UTIL_NET
 {
 	CNetCmd::CNetCmd()
+		:m_nBuffMode(NET_CMD_BUFF_MODE_NONE), m_uiBuffLen(0), m_ptr_buff(nullptr)
 	{
 		Init(0);
 	}
 
 	CNetCmd::CNetCmd(unsigned int uiSize)
+		: m_nBuffMode(NET_CMD_BUFF_MODE_NONE), m_uiBuffLen(0), m_ptr_buff(nullptr)
 	{
 		Init(uiSize);
 	}
@@ -35,11 +37,13 @@ namespace UTIL_NET
 			return UTIL_NET_ERR_MALLOC;
 		}
 		Clear();
+		m_nBuffMode = NET_CMD_BUFF_MODE_INTERNAL;
+		return UTIL_NET_ERR_SUCCESS;
 	}
 
 	void CNetCmd::UnInit()
 	{
-		if ((m_uiBuffLen > DEFAULT_BUFFER_LEN) && (m_ptr_buff != nullptr)){
+		if ((m_nBuffMode == NET_CMD_BUFF_MODE_INTERNAL) && (m_uiBuffLen > DEFAULT_BUFFER_LEN) && (m_ptr_buff != nullptr)){
 			delete[] m_ptr_buff;
 			m_ptr_buff = nullptr;
 			m_uiBuffLen = 0;
@@ -83,6 +87,7 @@ namespace UTIL_NET
 		assert(m_ptr_buff != nullptr);
 		PNET_DATA_HEAD pInfo = (PNET_DATA_HEAD)m_ptr_buff;
 		ZeroMemory(pInfo, sizeof(NET_DATA_HEAD));
+		pInfo->uiSize = sizeof(NET_DATA_HEAD);
 		pInfo->uiNetFlag = NET_DATA_HEAD_FLAG;
 	}
 
@@ -184,6 +189,20 @@ namespace UTIL_NET
 		return pInfo->bFinish;
 	}
 
+	void CNetCmd::SetSuspend(BOOL bSuspend)
+	{
+		assert(m_ptr_buff != nullptr);
+		PNET_DATA_HEAD pInfo = (PNET_DATA_HEAD)m_ptr_buff;
+		pInfo->bSuspend = bSuspend;
+	}
+
+	BOOL CNetCmd::GetSuspend() const
+	{
+		assert(m_ptr_buff != nullptr);
+		PNET_DATA_HEAD pInfo = (PNET_DATA_HEAD)m_ptr_buff;
+		return pInfo->bSuspend;
+	}
+
 	void CNetCmd::SetErrorCode(int iError)
 	{
 		assert(m_ptr_buff != nullptr);
@@ -202,7 +221,7 @@ namespace UTIL_NET
 	{
 		assert(m_ptr_buff != nullptr);
 		PNET_DATA_HEAD pInfo = (PNET_DATA_HEAD)m_ptr_buff;
-		if (iDataLen > (m_uiBuffLen - sizeof(NET_DATA_HEAD))){
+		if (iDataLen > (int)(m_uiBuffLen - sizeof(NET_DATA_HEAD))){
 			return 0;
 		}
 		memcpy(pInfo->buff, pDataBuff, iDataLen);
@@ -216,7 +235,7 @@ namespace UTIL_NET
 			return UTIL_NET_ERR_PAR;
 		}
 		PNET_DATA_HEAD pInfo = (PNET_DATA_HEAD)m_ptr_buff;
-		int len = min(iBuffLen, pInfo->uiDataLen);
+		int len = min((unsigned int)iBuffLen, pInfo->uiDataLen);
 		memcpy(pBuff, pInfo->buff, len);
 		return len;
 	}
@@ -226,6 +245,13 @@ namespace UTIL_NET
 		assert(m_ptr_buff != nullptr);
 		PNET_DATA_HEAD pInfo = (PNET_DATA_HEAD)m_ptr_buff;
 		pBuff = pInfo->buff;
+	}
+
+	BYTE* CNetCmd::GetDataPtr()
+	{
+		assert(m_ptr_buff != nullptr);
+		PNET_DATA_HEAD pInfo = (PNET_DATA_HEAD)m_ptr_buff;
+		return pInfo->buff;
 	}
 
 	unsigned int CNetCmd::GetDataBufferLen()
@@ -246,9 +272,67 @@ namespace UTIL_NET
 		return UTIL_NET_ERR_SUCCESS;
 	}
 
+	unsigned int CNetCmd::GetDataLen() const
+	{
+		assert(m_ptr_buff != nullptr);
+		PNET_DATA_HEAD pInfo = (PNET_DATA_HEAD)m_ptr_buff;
+		return pInfo->uiDataLen;
+	}
+
+	unsigned int CNetCmd::GetHeadLen() const
+	{
+		return sizeof(NET_DATA_HEAD);
+	}
+
 	CNetCmd& CNetCmd::operator= (CNetCmd const& other)
 	{
 		Copy(other);
 		return *this;
+	}
+
+	BYTE* CNetCmd::GetBufferPtr()
+	{
+		assert(m_ptr_buff != nullptr);
+		return m_ptr_buff;
+	}
+
+	unsigned int CNetCmd::GetDataTotalLen() const
+	{
+		assert(m_ptr_buff != nullptr);
+		PNET_DATA_HEAD pInfo = (PNET_DATA_HEAD)m_ptr_buff;
+		if (pInfo->uiSize + pInfo->uiDataLen > m_uiBuffLen){
+			return 0;
+		}
+		return pInfo->uiSize + pInfo->uiDataLen;
+	}
+
+	unsigned int CNetCmd::GetBufferLen() const
+	{
+		assert(m_ptr_buff != nullptr);
+		return m_uiBuffLen;
+	}
+
+	void CNetCmd::Attach(BYTE* pBuff, int iBuffLen)
+	{
+		if (nullptr == pBuff){
+			return;
+		}
+		m_nBuffMode = NET_CMD_BUFF_MODE_EXTERNAL;
+		m_ptr_buff = pBuff;
+		m_uiBuffLen = iBuffLen;
+	}
+
+	bool CNetCmd::Verity()
+	{
+		assert(m_ptr_buff != nullptr);
+		PNET_DATA_HEAD info = (PNET_DATA_HEAD)m_ptr_buff;
+		if (info->uiSize != sizeof(NET_DATA_HEAD)) {
+			return false;
+		}
+
+		if (info->uiNetFlag != NET_DATA_HEAD_FLAG){
+			return false;
+		}
+		return true;
 	}
 }

@@ -13,12 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="inc">
-      <UniqueIdentifier>{7dd1c28d-e71a-4359-adfe-91331566e759}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src">
-      <UniqueIdentifier>{ec46342b-bac5-44a2-a5b5-9e7f4a81767b}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -30,36 +24,12 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\NetCmd.h">
-      <Filter>inc</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\UtilNet.h">
-      <Filter>inc</Filter>
-    </ClInclude>
-    <ClInclude Include="internal.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\UtilNetDef.h">
-      <Filter>inc</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\NetSelect.h">
-      <Filter>inc</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dllmain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\NetCmd.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\NetSelect.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="UtilNet.cpp">
+    <ClCompile Include="UtilNetDemo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

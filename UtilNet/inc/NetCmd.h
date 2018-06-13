@@ -29,6 +29,8 @@ namespace UTIL_NET
 	*	unsigned int uiPeerContext;
 	*	完成.
 	*	BOOL bFinish;
+	*	终止任务.
+	*	BOOL bSuspend;
 	*	错误码.
 	*	int iError;
 	*	附带数据长度.
@@ -37,6 +39,16 @@ namespace UTIL_NET
 	*	BYTE buff[4];
 	*}NET_DATA_HEAD, *PNET_DATA_HEAD;
 	*/
+
+	enum NET_CMD_BUFF_MODE
+	{
+		NET_CMD_BUFF_MODE_NONE = 0,
+		/**< 内部分配.*/
+		NET_CMD_BUFF_MODE_INTERNAL = 1,
+		/**< 外部分配.*/
+		NET_CMD_BUFF_MODE_EXTERNAL = 2
+	};
+
 	class UTIL_NET_CPPAPI CNetCmd
 	{
 	public:
@@ -142,6 +154,8 @@ namespace UTIL_NET
 			外部数据指针地址
 		*/
 		void GetDataPtr(BYTE*& pBuff);
+		BYTE* GetDataPtr();
+
 		/**
 		@brief 获取附加数据缓存区大小.
 		\return 返回内部可存放的附加数据最大长度.
@@ -152,6 +166,51 @@ namespace UTIL_NET
 		\return 参见[UTIL_NET_ERROR]
 		*/
 		int SetDataLen(unsigned int iDataLen);
+		/**
+		@brief 获取附加数据大小.
+		\return 参见[UTIL_NET_ERROR]
+		*/
+		unsigned int GetDataLen() const;
+		/**
+		@brief 获取网络头数据大小.
+		\return 参见[UTIL_NET_ERROR]
+		*/
+		unsigned int GetHeadLen() const;
+
+		/**
+		@brief 获取内部缓存区地址.
+		\param pBuff
+			外部数据指针地址
+		*/
+		BYTE* GetBufferPtr();
+		/**
+		@brief 获取内部缓存区数据总长度.
+		*/
+		unsigned int GetDataTotalLen() const;
+		/**
+		@brief 获取内部缓存区总长度.
+		*/
+		unsigned int GetBufferLen() const;
+
+		/**
+		@brief 绑定外部数据地址.
+		\param pBuff
+			外部数据指针地址
+		*/
+		void Attach(BYTE* pBuff, int iBuffLen);
+		/*
+		@brief 验证数据是否完整.
+		*/
+		bool Verity();
+
+		/**
+		@brief 设置终止任务标识.
+		*/
+		void SetSuspend(BOOL bSuspend);
+		/**
+		@brief 获取终止任务标识.
+		*/
+		BOOL GetSuspend() const;
 
 	public:
 		CNetCmd(CNetCmd const &) = delete;
@@ -188,6 +247,8 @@ namespace UTIL_NET
 		BYTE m_buff[DEFAULT_BUFFER_LEN];
 		/**< 内部缓存区指针. _buff_len<=1024*64,_ptr_buff指向_buff,否则指向堆上地址.*/
 		BYTE* m_ptr_buff;
+		/**< 外部数据.*/
+		NET_CMD_BUFF_MODE m_nBuffMode;
 	};
 }
 #endif

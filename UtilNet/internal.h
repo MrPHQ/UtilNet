@@ -26,6 +26,8 @@ typedef struct _NET_DATA_HEAD
 	unsigned int uiPeerContext;
 	/**< 完成.*/
 	BOOL bFinish;
+	/**< 终止任务.*/
+	BOOL bSuspend;
 	/**< 错误码.*/
 	int iError;
 	/**< 附带数据长度.*/

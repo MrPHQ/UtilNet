@@ -23,4 +23,18 @@ enum UTIL_NET_ERROR {
 	UTIL_NET_ERR_MALLOC = -7,
 };
 
+/*
+@brief 网络通信节点信息
+*/
+typedef struct _UTIL_NET_NODE_INFO
+{
+	unsigned int uiSize;
+	/**< 节点IP地址.*/
+	char szIp[64];
+	/**< 节点端口.*/
+	int iPort;
+	/**< 详情.*/
+	sockaddr stAddr;
+}UTIL_NET_NODE_INFO, *PUTIL_NET_NODE_INFO;
+
 #endif

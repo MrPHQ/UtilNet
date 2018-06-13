@@ -5,6 +5,8 @@ VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UtilNet", "UtilNet\UtilNet.vcxproj", "{C229685E-51BC-4B72-B167-6C93D63E7A99}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UtilNetDemo", "UtilNetDemo\UtilNetDemo.vcxproj", "{B5909EE5-8022-47DE-87C8-BC97443C9AD2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -15,6 +17,10 @@ Global
 		{C229685E-51BC-4B72-B167-6C93D63E7A99}.Debug|Win32.Build.0 = Debug|Win32
 		{C229685E-51BC-4B72-B167-6C93D63E7A99}.Release|Win32.ActiveCfg = Release|Win32
 		{C229685E-51BC-4B72-B167-6C93D63E7A99}.Release|Win32.Build.0 = Release|Win32
+		{B5909EE5-8022-47DE-87C8-BC97443C9AD2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B5909EE5-8022-47DE-87C8-BC97443C9AD2}.Debug|Win32.Build.0 = Debug|Win32
+		{B5909EE5-8022-47DE-87C8-BC97443C9AD2}.Release|Win32.ActiveCfg = Release|Win32
+		{B5909EE5-8022-47DE-87C8-BC97443C9AD2}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
