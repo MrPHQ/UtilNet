@@ -270,6 +270,47 @@ namespace UTIL_NET
 	};
 
 	/*
+	@brief 初始化套接字使用环境,使用Winsock DLL.
+	*/
+	int UTIL_NET_CPPAPI InitSocket();
+	
+	/*
+	@brief
+	*/
+	int UTIL_NET_CPPAPI UnInitSocket();
+
+	/*
+	@brief 关闭套接字
+	*/
+	int UTIL_NET_CPPAPI CloseSocket(SOCKET);
+
+	/*
+	@brief 复制套接字.
+	\param skt
+		有效的套接字
+	\param pid
+		将使用复制套接字的目标进程的进程标识符.
+	\param pProtocolInfo
+		指向由客户端分配的缓冲区的指针，其大小足以包含WSAPROTOCOL_INFO结构.
+	\param iBuffLen
+		缓存区大小
+	\param pDataLen
+		数据大小
+	*/
+	int UTIL_NET_CPPAPI DuplicateSocket(SOCKET skt, DWORD pid, BYTE* pProtocolInfo, int iBuffLen, int* pDataLen);
+	
+	/*
+	@brief 根据协议信息结构内容,创建套接字.
+	\param pProtocolInfo
+		协议信息结构
+	\param iBuffLen
+		缓存区大小
+	\param skt
+		分配的套接字
+	*/
+	int UTIL_NET_CPPAPI CreateSocketFromDuplicate(BYTE* pProtocolInfo, int iDataLen, SOCKET& skt);
+
+	/*
 	@brief 检索套接字的本地名称.
 	\param skt
 		有效套接字

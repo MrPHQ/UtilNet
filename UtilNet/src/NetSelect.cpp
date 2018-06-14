@@ -10,6 +10,7 @@ namespace UTIL_NET
 
 	CNetBase::~CNetBase()
 	{
+		UnInit();
 	}
 
 	int CNetBase::Init(unsigned int uiBufferSize /*= DEFAULT_NET_DATA_BUFFER_LEN*/)
@@ -111,22 +112,28 @@ namespace UTIL_NET
 		}
 
 		if (cb){
-			iRet = cb(pNetCmdPtr);
-			if ((iRet == 0) && (pNetCmdPtr != nullptr)){
-				iSendLen = Send(pNetCmdPtr, uiTimeOut, true);
-				iSendTotolLen += iSendLen;
+			while (true)
+			{
+				iRet = cb(pNetCmdPtr);
+				if ((iRet == 0) && (pNetCmdPtr != nullptr)){
+					iSendLen = Send(pNetCmdPtr, uiTimeOut, true);
+					iSendTotolLen += iSendLen;
 
-				if (IsError()){
-					if (err != nullptr){
-						*err = UTIL_NET_ERR_FAIL;
+					if (IsError()){
+						if (err != nullptr){
+							*err = UTIL_NET_ERR_FAIL;
+						}
+						return iSendTotolLen;
 					}
-					return iSendTotolLen;
+					if (tsTimeOut.Check(GetTickCount(), false)){
+						if (err != nullptr){
+							*err = UTIL_NET_ERR_TIMEOUT;
+						}
+						return iSendTotolLen;
+					}
 				}
-				if (tsTimeOut.Check(GetTickCount(), false)){
-					if (err != nullptr){
-						*err = UTIL_NET_ERR_TIMEOUT;
-					}
-					return iSendTotolLen;
+				else{
+					break;
 				}
 			}
 		}
@@ -172,22 +179,28 @@ namespace UTIL_NET
 		}
 
 		if (cb){
-			iRet = cb(pNetCmdPtr);
-			if ((iRet == 0) && (pNetCmdPtr != nullptr)){
-				iSendLen = SendToUDP(pDataBuff, to, tolen, uiTimeOut, true);
-				iSendTotolLen += iSendLen;
+			while (true)
+			{
+				iRet = cb(pNetCmdPtr);
+				if ((iRet == 0) && (pNetCmdPtr != nullptr)){
+					iSendLen = SendToUDP(pDataBuff, to, tolen, uiTimeOut, true);
+					iSendTotolLen += iSendLen;
 
-				if (IsError()){
-					if (err != nullptr){
-						*err = UTIL_NET_ERR_FAIL;
+					if (IsError()){
+						if (err != nullptr){
+							*err = UTIL_NET_ERR_FAIL;
+						}
+						return iSendTotolLen;
 					}
-					return iSendTotolLen;
+					if (tsTimeOut.Check(GetTickCount(), false)){
+						if (err != nullptr){
+							*err = UTIL_NET_ERR_TIMEOUT;
+						}
+						return iSendTotolLen;
+					}
 				}
-				if (tsTimeOut.Check(GetTickCount(), false)){
-					if (err != nullptr){
-						*err = UTIL_NET_ERR_TIMEOUT;
-					}
-					return iSendTotolLen;
+				else{
+					break;
 				}
 			}
 		}
@@ -196,7 +209,6 @@ namespace UTIL_NET
 
 	bool CNetBase::CheckStatus()
 	{
-		std::unique_lock<std::mutex> lck(m_lock.GetMutex());
 		if (IsError()){
 			if (m_cbStatusCallback){
 				m_cbStatusCallback(FALSE);
@@ -216,6 +228,10 @@ namespace UTIL_NET
 		if (nullptr == pBuffer){
 			return;
 		}
+		if (m_buff.SpaceEx() <= 0){
+			MSG_INFO("ERROR Buffer .LINE:%d", __LINE__);
+			return;
+		}
 		char* pBuffData = nullptr;
 		size_t uiNeedReadDataLen = 0, uiReadLen = 0;
 		PNET_DATA_HEAD pCommData;
@@ -223,13 +239,13 @@ namespace UTIL_NET
 		PUTIL_NET_NODE_INFO pNodeInfo = nullptr;
 		UTILS::NET::TRANS_PROTOCOL_TYPE nType = GetObjectIns().GetTransProtocol();
 		if (nType == UTILS::NET::TRANS_PROTOCOL_TYPE_TCP){
-			iDataLen = GetObjectIns().Read((char*)m_buff.GetDataEnd(), m_buff.Space(), 0, 2000);
+			iDataLen = GetObjectIns().Read((char*)m_buff.GetDataEnd(), m_buff.SpaceEx(), 0, 2000);
 		}
 		else if (nType == UTILS::NET::TRANS_PROTOCOL_TYPE_UDP)
 		{
 			sockaddr from;
 			int len = sizeof(sockaddr);
-			iDataLen = GetObjectIns().ReadFromUDP((char*)m_buff.GetDataEnd(), m_buff.Space(), from, len, 2000);
+			iDataLen = GetObjectIns().ReadFromUDP((char*)m_buff.GetDataEnd(), m_buff.SpaceEx(), from, len, 2000);
 			if (iDataLen > 0)
 			{
 				UTIL_NET_NODE_INFO stNodeInfo;
@@ -244,11 +260,12 @@ namespace UTIL_NET
 		if (iDataLen <= 0) {
 			return;
 		}
+
 		m_buff.Write((size_t)iDataLen);
 
 		do
 		{
-			if (m_buff.Size() <= sizeof(NET_DATA_HEAD)) {
+			if (m_buff.Size() < sizeof(NET_DATA_HEAD)) {
 				break;
 			}
 			pCommData = (PNET_DATA_HEAD)(m_buff.GetDataStart());
@@ -257,6 +274,7 @@ namespace UTIL_NET
 				MSG_INFO("ERROR .Clear Data.LINE:%d", __LINE__);
 				break;
 			}
+
 			if (pCommData->uiSize + pCommData->uiDataLen > m_buff.Size()) {
 				break;
 			}
@@ -273,6 +291,7 @@ namespace UTIL_NET
 				MSG_INFO("Net Data Error LINE:%d", __LINE__);
 				break;
 			}
+
 			if (m_cbDataCallback){
 				m_cbDataCallback(pBuffer, pNodeInfo);
 			}
@@ -449,5 +468,30 @@ namespace UTIL_NET
 			break;
 		}
 		return UTILS::NET::StuffSockAddr(nType2, ip, port, addr);
+	}
+
+	int UTIL_NET_CPPAPI InitSocket()
+	{
+		return UTILS::NET::InitSocket();
+	}
+
+	int UTIL_NET_CPPAPI UnInitSocket()
+	{
+		return UTILS::NET::InitSocket();
+	}
+
+	int UTIL_NET_CPPAPI CloseSocket(SOCKET skt)
+	{
+		return UTILS::NET::CloseSocket(skt);
+	}
+
+	int UTIL_NET_CPPAPI DuplicateSocket(SOCKET skt, DWORD pid, BYTE* pProtocolInfo, int iBuffLen, int* pDataLen)
+	{
+		return UTILS::NET::DuplicateSocket(skt, pid, pProtocolInfo, iBuffLen, pDataLen);
+	}
+
+	int UTIL_NET_CPPAPI CreateSocketFromDuplicate(BYTE* pProtocolInfo, int iDataLen, SOCKET& skt)
+	{
+		return UTILS::NET::CreateSocketFromDuplicate(pProtocolInfo, iDataLen, skt);
 	}
 }
