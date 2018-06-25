@@ -228,6 +228,9 @@ namespace UTIL_NET
 		if (nullptr == pBuffer){
 			return;
 		}
+		if (IsError()){
+			return;
+		}
 		if (m_buff.SpaceEx() <= 0){
 			MSG_INFO("ERROR Buffer .LINE:%d", __LINE__);
 			return;
